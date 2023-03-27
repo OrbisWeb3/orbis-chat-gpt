@@ -94,13 +94,17 @@ export default function Conversations({conversations, selectedConv, setSelectedC
 
 /** Conversation details */
 const Conversation = ({conversation, selectedConv, setSelectedConv}) => {
+  function getLastMessage() {
+    let lastMessage = localStorage.getItem("conv-" + conversation.stream_id);
+    return lastMessage;
+  }
   return(
     <div className={`flex flex-row items-center py-4 px-6 cursor-pointer border-y  hover:border-slate-100 hover:bg-white ${(selectedConv && selectedConv.stream_id == conversation.stream_id) ? "border-slate-200 bg-white" : "border-transparent"}`} onClick={() => setSelectedConv(conversation)}>
        <div className="flex flex-col flex-grow ml-3">
           <div className="flex items-center">
              <div className="text-sm font-medium">{conversation.content.name ? conversation.content.name : "{no_name}"}</div>
           </div>
-          <div className="text-xs truncate w-40">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Debitis, doloribus?</div>
+          <div className="text-xs truncate w-40">{getLastMessage()}</div>
        </div>
     </div>
   )

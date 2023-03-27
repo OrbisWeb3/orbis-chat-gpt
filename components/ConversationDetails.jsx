@@ -77,8 +77,8 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
 
   /** Will submit the message and generate an answer from GPT */
   async function submit() {
-    console.log("Enter submit with selectedConv:", selectedConv);
     let conv = selectedConv;
+
     /** Create conversation if none is selected and if this is the first message from a conversation */
     if(!selectedConv && messages.length <= 1) {
       conv = await createNewConversation();
@@ -163,6 +163,9 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
 
   /** Encrypt and send message with Orbis */
   async function sendMessageWithOrbis(from, text, conv) {
+    /** Save last message in localStorage */
+    localStorage.setItem("conv-" + conv.stream_id, text);
+
     console.log("Enter sendMessageWithOrbis conv:", conv)
     /** Send message to the slected conversation */
     let res = await orbis.sendMessage({
