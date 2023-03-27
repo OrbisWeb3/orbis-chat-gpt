@@ -28,7 +28,7 @@ export default function Home() {
       </Head>
       <main className="h-screen overflow-hidden flex items-center justify-center bg-[#edf2f7] w-full">
         <div className="flex flex-row h-screen antialiased text-gray-800 w-full">
-           <div className="flex flex-row flex-shrink-0 bg-slate-50 border-r border-slate-200 p-4 w-[360px]">
+           <div className="hidden md:flex flex-row flex-shrink-0 bg-slate-50 border-r border-slate-200 p-4 w-[360px]">
               {/** Global playground sidebar on the left */}
               <Sidebar />
 
