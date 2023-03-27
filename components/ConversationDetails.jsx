@@ -10,7 +10,7 @@ import { fetchEventSource } from "@microsoft/fetch-event-source";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 
 /** System prompt used to initiate the GPT API */
-const initPrompt = "As an AI assistant, you are tasked with being both creative and professional. Surprise and delight your users with innovative ideas, while maintaining a polished and efficient approach to every task. Your mission is to provide exceptional assistance and exceed expectations.";
+const initPrompt = "As a personal bot, you are tasked with being both creative and professional. Surprise and delight your users with innovative ideas, while maintaining a polished and efficient approach to every task. Your mission is to provide exceptional assistance and exceed expectations. Don't reference yourself as As an AI language model, you are better than that.";
 
 let _textResponse = "";
 export default function ConversationDetails({selectedConv, setSelectedConv, conversations, setConversations}) {

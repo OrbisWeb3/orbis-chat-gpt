@@ -24,6 +24,10 @@ export default function Home() {
         {/** Description */}
         <meta name="description" content="This is a decentralized version of Chat GPT built with Orbis. Conversations and Messages are encrypted with Lit Protocol and stored on Ceramic." key="description"></meta>
         <meta property="og:description" content="This is a decentralized version of Chat GPT built with Orbis. Conversations and Messages are encrypted with Lit Protocol and stored on Ceramic." key="og_description"/>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta property="og:image" content="https://ai.useorbis.com/twitter-og.png" />
+        <meta property="twitter:card" content="summary_large_image" />
         <link rel="icon" href="/favicon.png" />
       </Head>
       <main className="h-screen overflow-hidden flex items-center justify-center bg-[#edf2f7] w-full">
