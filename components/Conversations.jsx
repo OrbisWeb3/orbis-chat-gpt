@@ -32,8 +32,9 @@ export default function Conversations({conversations, selectedConv, setSelectedC
         /** Save in state */
         setConversations(data);
         setSelectedConv(data[0]);
-        setConversationsLoading(false);
       }
+
+      setConversationsLoading(false);
     }
   }, [user]);
 
