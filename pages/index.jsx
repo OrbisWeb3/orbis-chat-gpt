@@ -18,12 +18,12 @@ export default function Home() {
     <>
       <Head>
         {/** Title */}
-        <title key="title">Decentralized Chat GPT  | Orbis</title>
-        <meta property="og:title" content="Decentralized Chat GPT  | Orbis" key="og_title" />
+        <title key="title">Decentralized ChatGPT  | Orbis</title>
+        <meta property="og:title" content="Decentralized ChatGPT  | Orbis" key="og_title" />
 
         {/** Description */}
-        <meta name="description" content="This is a decentralized version of Chat GPT built with Orbis. Conversations and Messages are encrypted with Lit Protocol and stored on Ceramic." key="description"></meta>
-        <meta property="og:description" content="This is a decentralized version of Chat GPT built with Orbis. Conversations and Messages are encrypted with Lit Protocol and stored on Ceramic." key="og_description"/>
+        <meta name="description" content="This is a decentralized version of ChatGPT built with Orbis. Conversations and Messages are encrypted with Lit Protocol and stored on Ceramic." key="description"></meta>
+        <meta property="og:description" content="This is a decentralized version of ChatGPT built with Orbis. Conversations and Messages are encrypted with Lit Protocol and stored on Ceramic." key="og_description"/>
 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta property="og:image" content="https://ai.useorbis.com/twitter-og.png" />
