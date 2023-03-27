@@ -47,6 +47,7 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     }
   }, [credentials, global.orbis_context]);
 
+  /** Will load messages from a conversation when the conversation is updated */
   useEffect(() => {
     /** Reset conversation */
     setMessages([
@@ -192,7 +193,7 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
   /** Encrypt and send message with Orbis */
   async function sendMessageWithOrbis(from, text, conv) {
     /** Save last message in localStorage */
-    localStorage.setItem("conv-" + conv.stream_id, text);
+    localStorage.setItem("conv-" + conv.stream_id, text.substring(0, 100));
 
     console.log("Enter sendMessageWithOrbis conv:", conv)
     /** Send message to the slected conversation */
