@@ -5,16 +5,19 @@ import MessageInput from "./MessageInput";
 import { Orbis, useOrbis, User, AccessRulesModal, checkContextAccess } from "@orbisclub/components";
 import { LoadingCircle } from "./Icons";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { initPrompt } from "../utils/ai";
 
 /** Manage WalletConnect */
 import WalletConnectProvider from "@walletconnect/web3-provider";
+
+/** System prompt used to initiate the GPT API */
+const initPrompt = "As an AI assistant, you are tasked with being both creative and professional. Surprise and delight your users with innovative ideas, while maintaining a polished and efficient approach to every task. Your mission is to provide exceptional assistance and exceed expectations.";
 
 let _textResponse = "";
 export default function ConversationDetails({selectedConv, setSelectedConv, conversations, setConversations}) {
   const { orbis, user, credentials, setUser } = useOrbis();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [accessRulesModalVis, setAccessRulesModalVis] = useState(false);
   const [currentResponse, setCurrentResponse] = useState("");
   const [contextAccessRules, setContextAccessRules] = useState([]);
@@ -29,7 +32,6 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     }
 
     async function loadContextDetails() {
-      console.log("credentials:", credentials);
       setHasAccess(false)
       let { data, error } = await orbis.api.from("orbis_contexts").select().eq('stream_id', global.orbis_context).single();
       console.log("data:", data);
@@ -70,11 +72,17 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
 
         /** Loop through all messages returned by Orbis */
         for (let i = [...data].reverse().length - 1; i >= 0; i--) {
-          let res = await orbis.decryptMessage(data[i].content);
-          console.log("res:", res);
+          let msgText = localStorage.getItem(data[i].stream_id);
+          if(!msgText) {
+            let res = await orbis.decryptMessage(data[i].content);
+            msgText = res.result;
+            localStorage.setItem(data[i].stream_id, msgText);
+          }
+
+          /** Add decrypted message to the array */
           _messages.push({
             role: data[i].content.data?.from ? data[i].content.data.from : "user" ,
-            content: res.result
+            content: msgText
           });
         }
 
@@ -106,6 +114,7 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
 
   /** Will submit the message and generate an answer from GPT */
   async function submit() {
+    setSubmitting(true);
     let conv = selectedConv;
 
     /** Create conversation if none is selected and if this is the first message from a conversation */
@@ -180,9 +189,11 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
           sendMessageWithOrbis("assistant", _textResponse, conv);
           _textResponse = "";
           setCurrentResponse(null);
+          setSubmitting(false);
         },
         onerror(err) {
           console.log("There was an error from server", err);
+          setSubmitting(false);
         },
       });
     } catch(e) {
@@ -204,6 +215,7 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
       from: from
     });
     console.log("message sent:", res);
+    localStorage.setItem(res.doc, text);
   }
   /** Create conversation if none is selected and if this is the first message from a conversation */
   async function createNewConversation() {
@@ -321,7 +333,7 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
         {(user && user.hasLit) ?
           <>
             {hasAccess ?
-              <MessageInput message={message} handleKeyDown={handleKeyDown} handleInputChange={handleInputChange} submit={submit} />
+              <MessageInput submitting={submitting} message={message} handleKeyDown={handleKeyDown} handleInputChange={handleInputChange} submit={submit} />
             :
               <p className="text-slate-600 w-full text-center text-sm pb-1 pt-1">This app is gated based on some conditions. <span className="font-medium hover:underline text-blue-800 cursor-pointer" onClick={() => setAccessRulesModalVis(true)}>View conditions</span></p>
             }
