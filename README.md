@@ -1,4 +1,8 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Introducing Orbis AI, the decentralized version of Chat GPT - an AI assistant that can answer any questions you might have. Built with the [Orbis SDK](https://useorbis.com) and OpenAI, Orbis AI allows you to communicate with an AI assistant in a decentralized and secure manner, without the need for a central server.
+
+Powered by the Orbis Open Social Protocol to ensure that your conversations are secure and private (every messages are encrypted with Lit Protocol).
+
+Orbis AI is designed to be user-friendly, making it easy for anyone to use. Whether you're a tech-savvy individual or a casual user. Feel free to fork this repository or to test it [here](https://ai.useorbis.com).
 
 ## Getting Started
 
@@ -14,7 +18,7 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+You can start editing the page by modifying `pages/index.jsx`. The page auto-updates as you edit the file.
 
 [API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 

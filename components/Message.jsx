@@ -22,7 +22,7 @@ export default function Message({message, sent}) {
             <div className="hidden md:flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
               <OrbisLogo width="21" height="28" />
             </div>
-            <div className="relative ml-3 text-sm bg-white py-2 px-4 border border-slate-200 rounded-xl space-y-3 message-content" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
+            <div className="relative md:ml-3 text-sm bg-white py-2 px-4 border border-slate-200 rounded-xl space-y-3 message-content" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
          </div>
       </div>
     );
