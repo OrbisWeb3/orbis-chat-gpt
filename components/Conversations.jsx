@@ -20,9 +20,11 @@ export default function Conversations({conversations, selectedConv, setSelectedC
         /** Loop through all messages returned by Orbis */
         for (let i = data.length - 1; i >= 0; i--) {
           if(data[i].content.encryptedName) {
-            let convName = await decryptString(data[i].content.encryptedName, "ethereum", localStorage);
-            if(convName) {
-              data[i].content.name = convName.result;
+            if(user.hasLit) {
+              let convName = await decryptString(data[i].content.encryptedName, "ethereum", localStorage);
+              if(convName) {
+                data[i].content.name = convName.result;
+              }
             }
           }
         }

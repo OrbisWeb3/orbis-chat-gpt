@@ -7,9 +7,12 @@ import { LoadingCircle } from "./Icons";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { initPrompt } from "../utils/ai";
 
+/** Manage WalletConnect */
+import WalletConnectProvider from "@walletconnect/web3-provider";
+
 let _textResponse = "";
 export default function ConversationDetails({selectedConv, setSelectedConv, conversations, setConversations}) {
-  const { orbis, user } = useOrbis();
+  const { orbis, user, setUser } = useOrbis();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentResponse, setCurrentResponse] = useState("");
@@ -203,6 +206,69 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     return newConversation;
   }
 
+  /** To make sure user is connected to Lit Protocol */
+  async function connectToLit() {
+    console.log("Enter connectToLit()");
+
+    /** Show loading state */
+    //setConnecting(true);
+
+    /** Get provider type in localStorage and Initiate provider netowrk */
+    let chain = "ethereum";
+    let providerType = localStorage.getItem("provider-type");
+    let provider;
+
+    switch (providerType) {
+      /** Metamask */
+      case "metamask":
+        provider = window.ethereum;
+        break;
+
+      /** Magic */
+      case "email":
+        provider = magic.rpcProvider;
+        break;
+
+      /** Wallet Connect */
+      case "wallet-connect":
+        /** Create WalletConnect Provider */
+        provider = new WalletConnectProvider({
+          infuraId: "9bf71860bc6c4560904d84cd241ab0a0",
+        });
+
+        /** Enable session (triggers QR Code modal) */
+        await provider.enable();
+        break;
+
+      /** Phantom */
+      case "phantom":
+        provider = window.phantom?.solana;
+        chain = "solana";
+        break;
+
+      /** Default: Metamask */
+      default:
+        provider = window.ethereum;
+        break;
+    }
+
+    /** Connect only to Lit protocol */
+    let res = await orbis.connectLit(provider);
+
+    if(res.status == 200) {
+      console.log("Success connecting to Lit!:", res);
+
+      /** Save new user object in state */
+      let _user = {...user};
+      _user.hasLit = true;
+      //setConnecting(false);
+      setUser(_user);
+    } else {
+      console.log("Error connecting to Lit: ", res);
+    }
+  }
+
+
   return(
     <div className="flex flex-col h-full w-full bg-white pb-4 flex-1">
 
@@ -220,7 +286,19 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
 
        {/** Input to send new messages */}
        <div className="flex flex-row items-center bg-gray-50 border-t border-slate-200 pt-3 px-3">
+        {(user && user.hasLit) ?
           <MessageInput message={message} handleKeyDown={handleKeyDown} handleInputChange={handleInputChange} submit={submit} />
+        :
+          <>
+            <div className="flex flex-row space-x-2 w-full items-center justify-center">
+              <p className="text-slate-600 text-center text-sm"><b>Last step:</b> Setup your encryption account to get started.</p>
+              <p className="text-center">
+                <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm" onClick={() => connectToLit()}>Setup</button>
+              </p>
+            </div>
+          </>
+        }
+
        </div>
     </div>
   )
