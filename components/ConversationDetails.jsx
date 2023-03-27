@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext, useMemo } from 'react';
 import Message from "./Message";
 import Messages from "./Messages";
 import MessageInput from "./MessageInput";
-import { Orbis, useOrbis, User } from "@orbisclub/components";
+import { Orbis, useOrbis, User, AccessRulesModal, checkContextAccess } from "@orbisclub/components";
 import { LoadingCircle } from "./Icons";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { initPrompt } from "../utils/ai";
@@ -12,12 +12,40 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 
 let _textResponse = "";
 export default function ConversationDetails({selectedConv, setSelectedConv, conversations, setConversations}) {
-  const { orbis, user, setUser } = useOrbis();
+  const { orbis, user, credentials, setUser } = useOrbis();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [accessRulesModalVis, setAccessRulesModalVis] = useState(false);
   const [currentResponse, setCurrentResponse] = useState("");
+  const [contextAccessRules, setContextAccessRules] = useState([]);
+  const [hasAccess, setHasAccess] = useState(false);
   const [messages, setMessages] = useState();
   const textareaRef = useRef();
+
+  /** Will load the details of the context and check if user has access to it  */
+  useEffect(() => {
+    if(user) {
+      loadContextDetails();
+    }
+
+    async function loadContextDetails() {
+      console.log("credentials:", credentials);
+      setHasAccess(false)
+      let { data, error } = await orbis.api.from("orbis_contexts").select().eq('stream_id', global.orbis_context).single();
+      console.log("data:", data);
+      if(data && data.content) {
+        /** Save context access rules in state */
+        setContextAccessRules(data.content.accessRules ? data.content.accessRules : []);
+
+        /** Now check if user has access */
+        if(!data.content.accessRules || data.content.accessRules.length == 0) {
+          setHasAccess(true)
+        } else {
+          checkContextAccess(user, credentials, data.content?.accessRules, () => setHasAccess(true));
+        }
+      }
+    }
+  }, [credentials, global.orbis_context]);
 
   useEffect(() => {
     /** Reset conversation */
@@ -290,7 +318,14 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
        {/** Input to send new messages */}
        <div className="flex flex-row items-center bg-gray-50 border-t border-slate-200 pt-3 px-3">
         {(user && user.hasLit) ?
-          <MessageInput message={message} handleKeyDown={handleKeyDown} handleInputChange={handleInputChange} submit={submit} />
+          <>
+            {hasAccess ?
+              <MessageInput message={message} handleKeyDown={handleKeyDown} handleInputChange={handleInputChange} submit={submit} />
+            :
+              <p className="text-slate-600 w-full text-center text-sm pb-1 pt-1">This app is gated based on some conditions. <span className="font-medium hover:underline text-blue-800 cursor-pointer" onClick={() => setAccessRulesModalVis(true)}>View conditions</span></p>
+            }
+
+          </>
         :
           <>
             <div className="flex flex-row space-x-2 w-full items-center justify-center">
@@ -301,8 +336,12 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
             </div>
           </>
         }
-
        </div>
+
+       {/** Display more details about the access rules required for this context */}
+       {accessRulesModalVis &&
+         <AccessRulesModal accessRules={contextAccessRules} hide={() => setAccessRulesModalVis(false)} />
+       }
     </div>
   )
 }
