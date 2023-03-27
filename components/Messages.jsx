@@ -27,7 +27,7 @@ export default function Messages({messages, currentResponse}) {
           })}
         </>
       :
-        <p className="text-slate-600 w-full text-center pb-12 text-sm">There aren't any messages in this conversation yet.</p>
+        <p className="text-slate-600 w-full text-center pb-12 text-sm">There aren&apos;t any messages in this conversation yet.</p>
       }
     </div>
   )

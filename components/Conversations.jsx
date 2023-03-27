@@ -34,7 +34,7 @@ export default function Conversations({conversations, selectedConv, setSelectedC
       }
     }
   }, [user]);
-  
+
   return(
     <div className="flex flex-col w-full h-full py-4 -mr-4 w-96">
       {/** Header */}
@@ -71,7 +71,7 @@ export default function Conversations({conversations, selectedConv, setSelectedC
                    })}
                  </>
                :
-                 <p className="text-slate-600 w-full text-center pt-6 text-sm px-12">You haven't created any conversation here yet. Try sending your first message.</p>
+                 <p className="text-slate-600 w-full text-center pt-6 text-sm px-12">You haven&apos;t created any conversation here yet. Try sending your first message.</p>
                }
              </>
            }
