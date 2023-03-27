@@ -10,8 +10,10 @@ export default function Message({message, sent}) {
     return(
       <div className="ml-[20%] md:ml-[40%] p-3 rounded-lg">
          <div className="flex items-start flex-row-reverse">
-            <UserPfp details={user} />
-            <div className="relative mr-3 text-sm bg-indigo-100 py-2 px-4 border border-indigo-300 rounded-xl space-y-3 message-content" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
+            <div className="flex">
+              <UserPfp details={user} />
+            </div>
+            <div className="flex-1 flex relative mr-3 text-sm bg-indigo-100 py-2 px-4 border border-indigo-300 rounded-xl space-y-3 message-content" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
          </div>
       </div>
     )
