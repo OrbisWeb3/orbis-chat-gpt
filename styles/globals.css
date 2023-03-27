@@ -21,14 +21,20 @@
   white-space: pre-wrap;
 }
 
-.message-content > code, .message-content > p > code, .message-content > ul > li > p > code {
+.message-content > code, .message-content > p > code, .message-content > ul > li > p > code, .message-content > ol > li > p > code {
   color: #000;
   font-size: 13px;
   background: #e2e8f0;
   padding: 0.25rem;
   border-radius: 4px;
 }
-
+.message-content ol {
+  list-style-type: decimal;
+  margin-left: 20px;
+}
+.message-content ol li, .message-content ul li {
+  margin-bottom: 3px;
+}
 :root {
   --max-width: 1100px;
   --border-radius: 12px;

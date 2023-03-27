@@ -41,20 +41,29 @@ export default function Home() {
            </div>
 
            {/** Conversation container */}
-           {user ?
-             <ConversationDetails
-                conversations={conversations}
-                setConversations={setConversations}
-                setSelectedConv={setSelectedConv}
-                selectedConv={selectedConv} />
+           {process.env.NEXT_PUBLIC_OPEN_AI_KEY ?
+             <>
+             {user ?
+               <ConversationDetails
+                  conversations={conversations}
+                  setConversations={setConversations}
+                  setSelectedConv={setSelectedConv}
+                  selectedConv={selectedConv} />
+             :
+                <div className="flex flex-col space-y-3 w-full">
+                  <p className="text-slate-600 w-full text-center pt-12 text-sm">You need to be connected to chat.</p>
+                  <p className="text-center">
+                    <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm" onClick={() => setConnectModalVis(true)}>Connect</button>
+                  </p>
+                </div>
+              }
+             </>
            :
-              <div className="flex flex-col space-y-3 w-full">
-                <p className="text-slate-600 w-full text-center pt-12 text-sm">You need to be connected to chat.</p>
-                <p className="text-center">
-                  <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm" onClick={() => setConnectModalVis(true)}>Connect</button>
-                </p>
-              </div>
-            }
+           <div className="flex flex-col space-y-3 w-full">
+             <p className="text-slate-600 w-full text-center pt-12 text-sm">Congratulations on forking this repository! <br/>You now need to use your own Open AI API key in the <b>NEXT_PUBLIC_OPEN_AI_KEY</b> environment variable.</p>
+           </div>
+          }
+
 
         </div>
       </main>
