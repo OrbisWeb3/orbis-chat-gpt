@@ -17,6 +17,7 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
   const { orbis, user, credentials, setUser } = useOrbis();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [commandMenu, setCommandMenu] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [accessRulesModalVis, setAccessRulesModalVis] = useState(false);
   const [currentResponse, setCurrentResponse] = useState("");
@@ -101,6 +102,14 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
   /** Will update question field */
   const handleInputChange = (e) => {
     setMessage(e.target.value);
+
+    /** Check commands */
+    if (e.target.value.charAt(0) === '/') {
+      console.log('Command detected');
+      setCommandMenu(true);
+    } else {
+      setCommandMenu(false);
+    }
   };
 
   /** Will handle keydown to submit message on enter */
@@ -120,7 +129,6 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     /** Create conversation if none is selected and if this is the first message from a conversation */
     if(!selectedConv && messages.length <= 1) {
       conv = await createNewConversation();
-      console.log("Conversation created: ", conv);
 
       /** Send user's message */
       sendMessageWithOrbis("user", message, conv);
@@ -142,12 +150,14 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     /** Reset fields */
     setMessage("");
 
+    /** Retrieve last 5 messages to pass them as a parameter (instead of using the whole conversation) */
+    let lastMessages = getLastMessages(5, _messages);
+
     /** Generate a prompt based on the question */
     let _promptData = {
       model: "gpt-3.5-turbo",
-      messages: _messages,
+      messages: lastMessages,
       stream: true,
-      temperature: 0.6,
       user: user.did
     };
     try {
@@ -206,7 +216,6 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     /** Save last message in localStorage */
     localStorage.setItem("conv-" + conv.stream_id, text.substring(0, 100));
 
-    console.log("Enter sendMessageWithOrbis conv:", conv)
     /** Send message to the slected conversation */
     let res = await orbis.sendMessage({
       conversation_id: conv.stream_id,
@@ -220,7 +229,6 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
   /** Create conversation if none is selected and if this is the first message from a conversation */
   async function createNewConversation() {
     let newConversation;
-    console.log("enter createNewConversation");
     let conversationName = message.substring(0, 50) + "...";
     let res = await orbis.createConversation(
       {
@@ -252,8 +260,6 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
 
   /** To make sure user is connected to Lit Protocol */
   async function connectToLit() {
-    console.log("Enter connectToLit()");
-
     /** Show loading state */
     //setConnecting(true);
 
@@ -333,7 +339,13 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
         {(user && user.hasLit) ?
           <>
             {hasAccess ?
-              <MessageInput submitting={submitting} message={message} handleKeyDown={handleKeyDown} handleInputChange={handleInputChange} submit={submit} />
+              <MessageInput
+                commandMenu={commandMenu}
+                submitting={submitting}
+                message={message}
+                handleKeyDown={handleKeyDown}
+                handleInputChange={handleInputChange}
+                submit={submit} />
             :
               <p className="text-slate-600 w-full text-center text-sm pb-1 pt-1">This app is gated based on some conditions. <span className="font-medium hover:underline text-blue-800 cursor-pointer" onClick={() => setAccessRulesModalVis(true)}>View conditions</span></p>
             }
@@ -357,4 +369,18 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
        }
     </div>
   )
+}
+
+/** Will return the last 5 messages from a conversation and add the initial prompt if it's missing */
+function getLastMessages(count, messages) {
+  let _messages = [];
+  if(messages.length <= count) {
+    _messages = messages
+  } else {
+    _messages = [
+      { role: "system", content: initPrompt },
+      ...messages.slice(-count)
+    ]
+  }
+  return _messages;
 }
