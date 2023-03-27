@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Orbis, useOrbis, UserPfp, UserPopup } from "@orbisclub/components";
-import { OrbisLogo } from "./Icons";
+import { OrbisLogo, GithubIcon, TwitterIcon } from "./Icons";
 import useOutsideClick from "../hooks/useOutsideClick";
+import Link from 'next/link'
 
 
 export default function Sidebar() {
@@ -15,15 +16,15 @@ export default function Sidebar() {
        </a>
        <ul className="flex flex-1 flex-col space-y-2 mt-12">
           <li>
-             <a href="#"
-                className="flex items-center">
+             <Link href="/" className="flex items-center">
                 <span className="flex items-center justify-center text-indigo-100 hover:bg-[#101d30] h-12 w-12 rounded-2xl">
                   <svg width="22" height="21" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M1.25 11L10.2045 2.04549C10.6438 1.60615 11.3562 1.60615 11.7955 2.04549L20.75 11M3.5 8.75V18.875C3.5 19.4963 4.00368 20 4.625 20H8.75V15.125C8.75 14.5037 9.25368 14 9.875 14H12.125C12.7463 14 13.25 14.5037 13.25 15.125V20H17.375C17.9963 20 18.5 19.4963 18.5 18.875V8.75M7.25 20H15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 </span>
-             </a>
+             </Link>
           </li>
+
           {/**
           <li>
              <a href="#"
@@ -36,6 +37,26 @@ export default function Sidebar() {
              </a>
           </li>
           */}
+       </ul>
+
+       {/** External links */}
+       <ul className="mb-3">
+         <li>
+            <Link href="https://github.com/OrbisWeb3/orbis-chat-gpt" target="_blank"
+               className="flex items-center">
+               <span className="flex items-center justify-center text-indigo-100 hover:bg-[#101d30] h-12 w-12 rounded-2xl">
+                 <GithubIcon />
+               </span>
+            </Link>
+         </li>
+         <li>
+            <Link href="https://twitter.com/useOrbis" target="_blank"
+               className="flex items-center">
+               <span className="flex items-center justify-center text-indigo-100 hover:bg-[#101d30] h-12 w-12 rounded-2xl">
+                 <TwitterIcon />
+               </span>
+            </Link>
+         </li>
        </ul>
 
        {/** Show connected user on bottom left */}

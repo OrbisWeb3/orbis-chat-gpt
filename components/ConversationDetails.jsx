@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useContext, useMemo } from 'react';
-import ConversationHeader from "./ConversationHeader";
 import Message from "./Message";
 import Messages from "./Messages";
 import MessageInput from "./MessageInput";
