@@ -14,7 +14,7 @@ export default function Sidebar() {
        <a href="#" className="flex items-center justify-center mt-1">
          <OrbisLogo />
        </a>
-       <ul className="flex flex-1 flex-col space-y-2 mt-12">
+       <ul className="flex flex-1 flex-col space-y-2 mt-6">
           <li>
              <Link href="/" className="flex items-center">
                 <span className="flex items-center justify-center text-indigo-100 hover:bg-[#101d30] h-12 w-12 rounded-2xl">
