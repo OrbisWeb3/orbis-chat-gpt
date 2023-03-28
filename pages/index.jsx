@@ -75,8 +75,26 @@ export default function Home() {
         {/** Show community pane */}
         {showDiscussionPane &&
           <BackgroundWrapper hide={() => setShowDiscussionPane(false)}>
-            <div className="h-full w-[610px] max-w-[90%] absolute right-[0px] bg-white border-l border-slate-400">
-              <Chat context="kjzl6cwe1jw14bixqvv1zj647a707e962fc39awh749lok3ivo3tfog1o2n44zd" />
+            <div className="flex h-full w-[610px] max-w-[90%] absolute right-[0px] bg-white flex-col">
+              <div className="flex bg-[#051224] py-6 px-4 sm:px-6 flex-col">
+                <div className="flex flex-row items-center justify-between">
+                  <h2 className="text-lg font-medium text-white" id="slide-over-title">Public Community Feed</h2>
+                  <div className="ml-3 flex h-7 items-center">
+                    <button type="button" className="rounded-md bg-transparent text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white" onClick={() => setShowDiscussionPane(false)}>
+                      <span className="sr-only">Close panel</span>
+                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-1">
+                  <p className="text-sm text-[#C6CAD2]">Chat with our community about your experience using our decentralized version of ChatGPT.</p>
+                </div>
+              </div>
+              <div className="flex flex-1 overflow-y-scroll">
+                <Chat context="kjzl6cwe1jw14bixqvv1zj647a707e962fc39awh749lok3ivo3tfog1o2n44zd" />
+              </div>
             </div>
           </BackgroundWrapper>
         }
