@@ -6,13 +6,16 @@ import styles from '@/styles/Home.module.css'
 import Sidebar from "../components/Sidebar";
 import Conversations from "../components/Conversations";
 import ConversationDetails from "../components/ConversationDetails";
+import BackgroundWrapper from "../components/BackgroundWrapper";
+
 const inter = Inter({ subsets: ['latin'] })
-import { Orbis, useOrbis, User } from "@orbisclub/components";
+import { Orbis, useOrbis, User, Chat } from "@orbisclub/components";
 
 export default function Home() {
   const { orbis, user, setConnectModalVis } = useOrbis();
   const [conversations, setConversations] = useState([]);
   const [selectedConv, setSelectedConv] = useState();
+  const [showDiscussionPane, setShowDiscussionPane] = useState(false);
 
   return (
     <>
@@ -34,7 +37,7 @@ export default function Home() {
         <div className="flex flex-row h-screen antialiased text-gray-800 w-full">
            <div className="hidden md:flex flex-row flex-shrink-0 bg-slate-50 border-r border-slate-200 p-4 w-[360px]">
               {/** Global playground sidebar on the left */}
-              <Sidebar />
+              <Sidebar setShowDiscussionPane={setShowDiscussionPane} />
 
               {/** List of conversations if user is connected */}
               <Conversations
@@ -67,9 +70,16 @@ export default function Home() {
              <p className="text-slate-600 w-full text-center pt-12 text-sm">Congratulations on forking this repository! <br/>You now need to use your own Open AI API key in the <b>NEXT_PUBLIC_OPEN_AI_KEY</b> environment variable.</p>
            </div>
           }
-
-
         </div>
+
+        {/** Show community pane */}
+        {showDiscussionPane &&
+          <BackgroundWrapper hide={() => setShowDiscussionPane(false)}>
+            <div className="h-full w-[610px] max-w-[90%] absolute right-[0px] bg-white border-l border-slate-400">
+              <Chat context="kjzl6cwe1jw14bixqvv1zj647a707e962fc39awh749lok3ivo3tfog1o2n44zd" />
+            </div>
+          </BackgroundWrapper>
+        }
       </main>
     </>
   )

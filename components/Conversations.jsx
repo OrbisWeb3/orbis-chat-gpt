@@ -64,7 +64,7 @@ export default function Conversations({conversations, selectedConv, setSelectedC
          {user ?
            <div className="flex flex-col -mx-4 pt-4">
            {conversationsLoading ?
-             <div className="flex text-gray-900 w-full items-center pt-12 pb-12 flex flex-col">
+             <div className="flex text-gray-900 w-full items-center pt-3 px-12 pb-12 flex flex-col">
                <p className="text-slate-600 w-full text-center text-sm pb-2">Loading and decrypting your previous conversations.</p>
                <LoadingCircle />
              </div>

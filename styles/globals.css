@@ -6,7 +6,9 @@
   font-family: "Inter";
   src: url("/fonts/Inter.ttf");
 }
-
+.message-content {
+  word-break: break-word;
+}
 .message-content pre {
   background: #1e293b;
   border-radius: 4px;
