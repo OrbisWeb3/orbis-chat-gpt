@@ -4,7 +4,7 @@ import { decryptString } from "@orbisclub/orbis-sdk";
 import { LoadingCircle } from "./Icons";
 
 export default function Conversations({conversations, selectedConv, setSelectedConv, setConversations}) {
-  const { orbis, user, setConnectModalVis } = useOrbis();
+  const { orbis, user, connecting, setConnectModalVis } = useOrbis();
   const [conversationsLoading, setConversationsLoading] = useState(false);
 
   useEffect(() => {
@@ -19,11 +19,16 @@ export default function Conversations({conversations, selectedConv, setSelectedC
 
         /** Loop through all messages returned by Orbis */
         for (let i = data.length - 1; i >= 0; i--) {
-          if(data[i].content.encryptedName) {
+          if(localStorage.getItem(data[i].stream_id + "-name")) {
+            data[i].content.name = localStorage.getItem(data[i].stream_id + "-name");
+          } else if(data[i].content.encryptedName) {
             if(user.hasLit) {
               let convName = await decryptString(data[i].content.encryptedName, "ethereum", localStorage);
               if(convName) {
                 data[i].content.name = convName.result;
+
+                /** Save last message in localStorage */
+                localStorage.setItem(data[i].stream_id + "-name", convName.result);
               }
             }
           }
@@ -85,8 +90,12 @@ export default function Conversations({conversations, selectedConv, setSelectedC
          :
            <div className="flex flex-col space-y-3 w-full px-12 pt-6">
              <p className="text-slate-600 w-full text-center text-sm">You need to be connected to chat.</p>
-             <p className="text-center">
-               <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm" onClick={() => setConnectModalVis(true)}>Connect</button>
+             <p className="text-center flex justify-center">
+               {connecting ?
+                 <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm flex flex-row items-center"><LoadingCircle style={{marginRight: 8}}/> Connecting</button>
+               :
+                 <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm" onClick={() => setConnectModalVis(true)}>Connect</button>
+               }
              </p>
            </div>
           }

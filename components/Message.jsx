@@ -13,7 +13,7 @@ export default function Message({message, sent}) {
             <div className="flex w-[60px]">
               <UserPfp details={user} />
             </div>
-            <div className="flex relative mr-3 text-sm bg-indigo-100 py-2 px-4 border border-indigo-300 rounded-xl space-y-3 message-content" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
+            <div className="relative mr-3 text-sm bg-indigo-100 py-2 px-4 border border-indigo-300 rounded-xl space-y-3 message-content" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
          </div>
       </div>
     )

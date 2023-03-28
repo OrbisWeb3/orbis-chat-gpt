@@ -7,12 +7,13 @@ import Sidebar from "../components/Sidebar";
 import Conversations from "../components/Conversations";
 import ConversationDetails from "../components/ConversationDetails";
 import BackgroundWrapper from "../components/BackgroundWrapper";
+import { LoadingCircle } from "../components/Icons";
 
 const inter = Inter({ subsets: ['latin'] })
 import { Orbis, useOrbis, User, Chat } from "@orbisclub/components";
 
 export default function Home() {
-  const { orbis, user, setConnectModalVis } = useOrbis();
+  const { orbis, user, connecting, setConnectModalVis } = useOrbis();
   const [conversations, setConversations] = useState([]);
   const [selectedConv, setSelectedConv] = useState();
   const [showDiscussionPane, setShowDiscussionPane] = useState(false);
@@ -48,28 +49,24 @@ export default function Home() {
            </div>
 
            {/** Conversation container */}
-           {process.env.NEXT_PUBLIC_OPEN_AI_KEY ?
-             <>
-             {user ?
-               <ConversationDetails
-                  conversations={conversations}
-                  setConversations={setConversations}
-                  setSelectedConv={setSelectedConv}
-                  selectedConv={selectedConv} />
-             :
-                <div className="flex flex-col space-y-3 w-full">
-                  <p className="text-slate-600 w-full text-center pt-12 text-sm">You need to be connected to chat.</p>
-                  <p className="text-center">
-                    <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm" onClick={() => setConnectModalVis(true)}>Connect</button>
-                  </p>
-                </div>
-              }
-             </>
+           {user ?
+             <ConversationDetails
+                conversations={conversations}
+                setConversations={setConversations}
+                setSelectedConv={setSelectedConv}
+                selectedConv={selectedConv} />
            :
-           <div className="flex flex-col space-y-3 w-full">
-             <p className="text-slate-600 w-full text-center pt-12 text-sm">Congratulations on forking this repository! <br/>You now need to use your own Open AI API key in the <b>NEXT_PUBLIC_OPEN_AI_KEY</b> environment variable.</p>
-           </div>
-          }
+              <div className="flex flex-col space-y-3 w-full">
+                <p className="text-slate-600 w-full text-center pt-12 text-sm">You need to be connected to chat.</p>
+                <p className="text-center flex justify-center">
+                  {connecting ?
+                    <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm flex flex-row items-center"><LoadingCircle style={{marginRight: 8}}/> Connecting</button>
+                  :
+                    <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm" onClick={() => setConnectModalVis(true)}>Connect</button>
+                  }
+                </p>
+              </div>
+            }
         </div>
 
         {/** Show community pane */}
