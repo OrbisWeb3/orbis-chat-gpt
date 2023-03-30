@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef, useContext, useMemo } from 'react';
 import Head from 'next/head'
-import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
 import Sidebar from "../components/Sidebar";
 import Conversations from "../components/Conversations";
 import ConversationDetails from "../components/ConversationDetails";
@@ -10,10 +8,10 @@ import BackgroundWrapper from "../components/BackgroundWrapper";
 import { LoadingCircle } from "../components/Icons";
 
 const inter = Inter({ subsets: ['latin'] })
-import { Orbis, useOrbis, User, Chat } from "@orbisclub/components";
+import { useOrbis, Chat } from "@orbisclub/components";
 
 export default function Home() {
-  const { orbis, user, connecting, setConnectModalVis } = useOrbis();
+  const { user, connecting, setConnectModalVis } = useOrbis();
   const [conversations, setConversations] = useState([]);
   const [selectedConv, setSelectedConv] = useState();
   const [showDiscussionPane, setShowDiscussionPane] = useState(false);
@@ -90,7 +88,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex flex-1 overflow-y-scroll">
-                <Chat context="kjzl6cwe1jw14bixqvv1zj647a707e962fc39awh749lok3ivo3tfog1o2n44zd" />
+                <Chat context={global.orbis_chat_context} />
               </div>
             </div>
           </BackgroundWrapper>
