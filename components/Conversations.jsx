@@ -47,7 +47,7 @@ export default function Conversations({conversations, selectedConv, setSelectedC
   }, [user]);
 
   return(
-    <div className="flex flex-col w-full h-full py-4 -mr-4 w-96">
+    <div className="flex flex-col w-full h-full py-4 -mr-4 w-96 overflow-x-hidden dark:bg-[#041b3b] dark:text-white">
       {/** Header */}
        <div className="flex flex-row items-center pl-4 pr-4">
           <div className="flex flex-row items-center">
@@ -64,7 +64,7 @@ export default function Conversations({conversations, selectedConv, setSelectedC
           </div>
        </div>
 
-       <div className="flex-1 mt-1 overflow-y-scroll">
+       <div className="flex-1 mt-1 overflow-y-scroll overflow-x-hidden">
          {/** Conversations list or connect CTA*/}
          {user ?
            <div className="flex flex-col -mx-4 pt-4">
@@ -82,14 +82,14 @@ export default function Conversations({conversations, selectedConv, setSelectedC
                    })}
                  </>
                :
-                 <p className="text-slate-600 w-full text-center pt-6 text-sm px-12">You haven&apos;t created any conversation here yet. Try sending your first message.</p>
+                 <p className="text-slate-600 w-full text-center pt-6 text-sm px-12 dark:text-slate-500">You haven&apos;t created any conversation here yet. Try sending your first message.</p>
                }
              </>
            }
            </div>
          :
-           <div className="flex flex-col space-y-3 w-full px-12 pt-6">
-             <p className="text-slate-600 w-full text-center text-sm">You need to be connected to chat.</p>
+           <div className="flex flex-col space-y-3 w-full px-12 pt-6 dark:bg-[#041b3b]">
+             <p className="text-slate-600 w-full text-center text-sm dark:text-slate-500">You need to be connected to chat.</p>
              <p className="text-center flex justify-center">
                {connecting ?
                  <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm flex flex-row items-center"><LoadingCircle style={{marginRight: 8}}/> Connecting</button>
@@ -111,7 +111,7 @@ const Conversation = ({conversation, selectedConv, setSelectedConv}) => {
     return lastMessage;
   }
   return(
-    <div className={`flex flex-row items-center py-4 px-6 cursor-pointer border-y  hover:border-slate-100 hover:bg-white ${(selectedConv && selectedConv.stream_id == conversation.stream_id) ? "border-slate-200 bg-white" : "border-transparent"}`} onClick={() => setSelectedConv(conversation)}>
+    <div className={`flex flex-row items-center py-4 px-6 cursor-pointer border-y  hover:border-slate-100 hover:bg-white dark:hover:bg-slate-700 dark:hover:border-slate-600 ${(selectedConv && selectedConv.stream_id == conversation.stream_id) ? "border-slate-200 bg-white dark:bg-slate-700 dark:border-slate-600" : "border-transparent"}`} onClick={() => setSelectedConv(conversation)}>
        <div className="flex flex-col flex-grow ml-3">
           <div className="flex items-center">
              <div className="text-sm font-medium">{conversation.content.name ? conversation.content.name : "{no_name}"}</div>

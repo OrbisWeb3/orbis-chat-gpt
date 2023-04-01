@@ -2,7 +2,7 @@ import Message from "./Message";
 
 export default function Messages({messages, currentResponse}) {
   return(
-    <div className="flex flex-col-reverse space-y-1 overflow-scroll h-full overflow-y-auto">
+    <div className="flex flex-col-reverse space-y-1 overflow-scroll h-full overflow-y-auto overflow-x-hidden">
       {/** Display current response if any */}
       {currentResponse &&
         <Message message={{role: "assistant", content: currentResponse}} />
@@ -27,7 +27,7 @@ export default function Messages({messages, currentResponse}) {
           })}
         </>
       :
-        <p className="text-slate-600 w-full text-center pb-12 text-sm">There aren&apos;t any messages in this conversation yet.</p>
+        <p className="text-slate-600 w-full text-center pb-12 text-sm dark:text-slate-500">There aren&apos;t any messages in this conversation yet.</p>
       }
     </div>
   )

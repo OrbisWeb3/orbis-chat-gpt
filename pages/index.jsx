@@ -34,7 +34,7 @@ export default function Home() {
       </Head>
       <main className="h-screen overflow-hidden flex items-center justify-center bg-[#edf2f7] w-full">
         <div className="flex flex-row h-screen antialiased text-gray-800 w-full">
-           <div className="hidden md:flex flex-row flex-shrink-0 bg-slate-50 border-r border-slate-200 p-4 w-[360px]">
+           <div className="hidden md:flex flex-row flex-shrink-0 bg-slate-50 border-r border-slate-200 p-4 w-[360px] dark:bg-[#041b3b]">
               {/** Global playground sidebar on the left */}
               <Sidebar setShowDiscussionPane={setShowDiscussionPane} />
 
@@ -54,8 +54,8 @@ export default function Home() {
                 setSelectedConv={setSelectedConv}
                 selectedConv={selectedConv} />
            :
-              <div className="flex flex-col space-y-3 w-full">
-                <p className="text-slate-600 w-full text-center pt-12 text-sm">You need to be connected to chat.</p>
+              <div className="flex flex-col space-y-3 w-full dark:bg-[#041b3b]">
+                <p className="text-slate-600 w-full text-center pt-12 text-sm dark:text-white">You need to be connected to chat.</p>
                 <p className="text-center flex justify-center">
                   {connecting ?
                     <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm flex flex-row items-center"><LoadingCircle style={{marginRight: 8}}/> Connecting</button>
