@@ -10,10 +10,10 @@ export default function Message({message, sent}) {
     return(
       <div className="ml-[20%] md:ml-[40%] p-3 rounded-lg">
          <div className="flex items-start flex-row-reverse">
-            <div className="flex w-[60px]">
+            <div className="flex">
               <UserPfp details={user} />
             </div>
-            <div className="relative mr-3 text-sm bg-indigo-100 py-2 px-4 border border-indigo-300 rounded-xl space-y-3 message-content" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
+            <div className="relative mr-3 text-sm bg-indigo-100 py-2 px-4 border border-indigo-300 rounded-xl space-y-3 message-content dark:bg-indigo-800 dark:text-white dark:border-indigo-600" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
          </div>
       </div>
     )
@@ -24,7 +24,7 @@ export default function Message({message, sent}) {
             <div className="hidden md:flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
               <OrbisLogo width="21" height="28" />
             </div>
-            <div className="relative md:ml-3 text-sm bg-white py-2 px-4 border border-slate-200 rounded-xl space-y-3 message-content" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
+            <div className="relative md:ml-3 text-sm bg-white py-2 px-4 border border-slate-200 rounded-xl space-y-3 message-content dark:bg-slate-600 dark:text-white dark:border-slate-700" dangerouslySetInnerHTML={{__html: marked.parse(message.content)}}></div>
          </div>
       </div>
     );

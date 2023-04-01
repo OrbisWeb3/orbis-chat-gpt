@@ -320,13 +320,13 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
 
 
   return(
-    <div className="flex flex-col h-full w-full bg-white pb-4 flex-1">
+    <div className="flex flex-col h-full w-full bg-white pb-4 flex-1 dark:bg-[#082042]">
 
        {/** List all messages in a conversation */}
        <div className="h-full overflow-hidden px-1 md:px-3">
         {loading ?
-          <div className="flex text-gray-900 w-full items-center pt-12 pb-12 flex flex-col">
-            <p className="text-slate-600 w-full text-center text-sm pb-2">Loading and decrypting your previous messages...</p>
+          <div className="flex text-gray-900 w-full items-center pt-12 pb-12 flex flex-col dark:bg-[#082042]">
+            <p className="text-slate-600 w-full text-center text-sm pb-2 dark:text-slate-400">Loading and decrypting your previous messages...</p>
             <LoadingCircle />
           </div>
         :
@@ -335,7 +335,7 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
        </div>
 
        {/** Input to send new messages */}
-       <div className="flex flex-row items-center bg-gray-50 border-t border-slate-200 pt-3 px-3">
+       <div className="flex flex-row items-center bg-gray-50 border-t border-slate-200 pt-3 px-3 dark:bg-[#082042] dark:border-slate-700">
         {(user && user.hasLit) ?
           <>
             {hasAccess ?
@@ -347,14 +347,14 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
                 handleInputChange={handleInputChange}
                 submit={submit} />
             :
-              <p className="text-slate-600 w-full text-center text-sm pb-1 pt-1">This app is gated based on some conditions. <span className="font-medium hover:underline text-blue-800 cursor-pointer" onClick={() => setAccessRulesModalVis(true)}>View conditions</span></p>
+              <p className="text-slate-600 w-full text-center text-sm pb-1 pt-1 dark:text-white">This app is gated based on some conditions. <span className="font-medium hover:underline text-blue-800 cursor-pointer" onClick={() => setAccessRulesModalVis(true)}>View conditions</span></p>
             }
 
           </>
         :
           <>
             <div className="flex flex-row space-x-2 w-full items-center justify-center">
-              <p className="text-slate-600 text-center text-sm"><b>Last step:</b> Setup your encryption account to get started.</p>
+              <p className="text-slate-600 text-center text-sm dark:text-white"><b>Last step:</b> Setup your encryption account to get started.</p>
               <p className="text-center">
                 <button className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm" onClick={() => connectToLit()}>Setup</button>
               </p>
