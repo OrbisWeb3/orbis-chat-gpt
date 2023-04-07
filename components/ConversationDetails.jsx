@@ -1,16 +1,23 @@
-import React, { useState, useEffect, useRef, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import Message from "./Message";
 import Messages from "./Messages";
 import MessageInput from "./MessageInput";
 import { Orbis, useOrbis, User, AccessRulesModal, checkContextAccess } from "@orbisclub/components";
-import { LoadingCircle } from "./Icons";
+import { LoadingCircle, MenuDots } from "./Icons";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { sleep } from "../utils";
+import BackgroundWrapper from "./BackgroundWrapper";
+import ConversationSettings from "./ConversationSettings";
 
 /** Manage WalletConnect */
 import WalletConnectProvider from "@walletconnect/web3-provider";
 
 /** System prompt used to initiate the GPT API */
 const initPrompt = "As a personal bot, you are tasked with being both creative and professional. Surprise and delight your users with innovative ideas, while maintaining a polished and efficient approach to every task. Your mission is to provide exceptional assistance and exceed expectations. Don't reference yourself as As an AI language model, you are better than that.";
+
+let _personas = [];
+let currentRound = 0;
+let personaEnabled = false;
 
 let _textResponse = "";
 export default function ConversationDetails({selectedConv, setSelectedConv, conversations, setConversations}) {
@@ -24,7 +31,10 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
   const [contextAccessRules, setContextAccessRules] = useState([]);
   const [hasAccess, setHasAccess] = useState(false);
   const [messages, setMessages] = useState();
+  const [writeMode, setWriteMode] = useState(false); /** This is only used in the persona mode to write custom prompt instead of having the AI answer */
   const textareaRef = useRef();
+  const [viewSettings, setViewSettings] = useState(false);
+  const [personas, setPersonas] = useState(_personas);
 
   /** Will load the details of the context and check if user has access to it  */
   useEffect(() => {
@@ -97,7 +107,7 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
 
       setLoading(false);
     }
-  }, [selectedConv])
+  }, [selectedConv]);
 
   /** Will update question field */
   const handleInputChange = (e) => {
@@ -122,94 +132,99 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
   }
 
   /** Will submit the message and generate an answer from GPT */
-  async function submit() {
-    setSubmitting(true);
-    let conv = selectedConv;
+  async function submit(persona) {
+  setSubmitting(true);
+  let conv = selectedConv;
 
-    /** Create conversation if none is selected and if this is the first message from a conversation */
-    if(!selectedConv && messages.length <= 1) {
-      conv = await createNewConversation();
+  if(personaEnabled) {
+    setWriteMode(false);
+  }
 
-      /** Send user's message */
-      sendMessageWithOrbis("user", message, conv);
-    } else {
-      /** Send user's message */
-      sendMessageWithOrbis("user", message, conv);
-    }
+  if(!selectedConv && messages.length <= 1) {
+    conv = await createNewConversation();
+    sendMessageWithOrbis("user", message, conv);
+  } else {
+    sendMessageWithOrbis("user", message, conv);
+  }
 
-    /** Loop messages */
-    let _messages = [...messages];
-    _messages.push(
-      {
-        role: "user",
-        content: message
-      }
-    );
-    setMessages(_messages);
+  let _messages = [...messages];
+  if(message) {
+    _messages.push({ role: "user", content: message });
+  }
+  setMessages(_messages);
 
-    /** Reset fields */
-    setMessage("");
+  setMessage("");
 
-    /** Retrieve last 5 messages to pass them as a parameter (instead of using the whole conversation) */
-    let lastMessages = getLastMessages(5, _messages);
+  if(personaEnabled && persona == null) {
+    setSubmitting(false);
+    return;
+  }
 
-    /** Generate a prompt based on the question */
-    let _promptData = {
-      model: "gpt-3.5-turbo",
-      messages: lastMessages,
-      stream: true,
-      user: user.did
-    };
-    try {
-      const responseStreamed = await fetchEventSource("https://api.openai.com/v1/chat/completions", {
+  let lastMessages = getLastMessages(5, _messages, persona);
+
+  let _promptData = {
+    model: "gpt-3.5-turbo",
+    messages: lastMessages,
+    stream: true,
+    user: user.did
+  };
+
+  /* Trying to move this server-side
+  const eventSource = new EventSource(`/api/stream-answer${JSON.stringify(promptData)}`);
+  eventSource.onmessage = (event) => {
+    console.log("event.data:", event.data);
+  };*/
+
+  try {
+    const responseStreamed = await fetchEventSource("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         body: JSON.stringify(_promptData),
         headers: {
           "Content-Type": "application/json",
           'Authorization': "Bearer " + process.env.NEXT_PUBLIC_OPEN_AI_KEY,
-          'OpenAI-Organization': 'org-WbmUqbZDRruhWmTtqo3ToWPO'
+          'OpenAI-Organization': 'org-lxESgWKgBRJuQgfwrozZGFsa'
         },
-        onopen(res) {
-          if (res.ok && res.status === 200) {
-          } else if (
-            res.status >= 400 &&
-            res.status < 500 &&
-            res.status !== 429
-          ) {
-            console.log("Client side error ", res);
+      onopen(res) {
+        if (res.ok && res.status === 200) {
+        } else if (
+          res.status >= 400 &&
+          res.status < 500 &&
+          res.status !== 429
+        ) {
+          console.log("Client side error ", res);
+        }
+      },
+      onmessage(event) {
+        if(event.data != "[DONE]") {
+          const parsedData = JSON.parse(event.data);
+          if(parsedData?.choices[0]?.delta?.content) {
+            _textResponse = _textResponse + parsedData.choices[0].delta.content
+            setCurrentResponse(_textResponse);
           }
-        },
-        onmessage(event) {
-          if(event.data != "[DONE]") {
-            const parsedData = JSON.parse(event.data);
-            if(parsedData?.choices[0]?.delta?.content) {
-              _textResponse = _textResponse + parsedData.choices[0].delta.content
-              setCurrentResponse(_textResponse);
-            }
+        }
+      },
+      async onclose() {
+        _messages.push(
+          {
+            role: "assistant",
+            content: _textResponse
           }
-        },
-        onclose() {
-          _messages.push(
-            {
-              role: "assistant",
-              content: _textResponse
-            }
-          );
-          setMessages(_messages);
-          sendMessageWithOrbis("assistant", _textResponse, conv);
-          _textResponse = "";
-          setCurrentResponse(null);
-          setSubmitting(false);
-        },
-        onerror(err) {
-          console.log("There was an error from server", err);
-          setSubmitting(false);
-        },
-      });
-    } catch(e) {
-      console.log("Error retrieving response from assistant:", e);
-    }
+        );
+        setMessages(_messages);
+        sendMessageWithOrbis("assistant", _textResponse, conv);
+        _textResponse = "";
+        setCurrentResponse(null);
+        setSubmitting(false);
+      },
+      onerror(err) {
+        console.log("There was an error from server", err);
+        setSubmitting(false);
+      },
+    });
+  } catch(e) {
+    console.log("Error retrieving response from assistant:", e);
   }
+}
 
   /** Encrypt and send message with Orbis */
   async function sendMessageWithOrbis(from, text, conv) {
@@ -223,7 +238,6 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     }, {
       from: from
     });
-    console.log("message sent:", res);
     localStorage.setItem(res.doc, text);
   }
   /** Create conversation if none is selected and if this is the first message from a conversation */
@@ -232,10 +246,7 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     let conversationName = message.substring(0, 50) + "...";
     let res = await orbis.createConversation(
       {
-        recipients: [
-          "did:key:z6MkhvoSQhPDNwotybwX9o2scoSvkx5Syem3GiM9FV8h5YXG",
-          user.did
-        ],
+        recipients: [user.did],
         context: global.orbis_context,
         name: conversationName
       }
@@ -256,6 +267,65 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     ]);
 
     return newConversation;
+  }
+
+  /** Will return the last 5 messages from a conversation and add the initial prompt if it's missing */
+  function getLastMessages(count, messages, persona) {
+    let _messages = [];
+    if(personaEnabled) {
+      console.log("Enter getLastMessages with persona:", persona);
+      /** For personas we increase the historical data sent within the request */
+      count = count * 2;
+
+      /** Will re-work the messages array to alternate the different personas */
+      /** Step 1: Loop through all messages to mark reverse the assistant / user roles */
+      messages.forEach((msg, i) => {
+        if(msg.role != "system") {
+          _messages.push({
+            role: "user",
+            content: msg.content
+          });
+        }
+        /*if(msg.role == "user") {
+          _messages.push({
+            role: "assistant",
+            content: msg.content
+          })
+        } else if(msg.role == "assistant") {
+          _messages.push({
+            role: "user",
+            content: msg.content
+          })
+        }*/
+      });
+
+      /** Step 2: Select current persona's role */
+      let currentPersona = personas[persona ? persona : 0];
+
+      /** Step 3: Add current persona's role as system */
+      _messages = [
+        {
+          role: "user",
+          content: currentPersona.content
+        },
+        ..._messages.slice(-count)
+      ];
+
+      console.log("lastMessages:", _messages);
+
+    } else {
+      /** Will make sure we only send the last messages */
+      if(messages.length <= count) {
+        _messages = messages
+      } else {
+        _messages = [
+          { role: "system", content: initPrompt },
+          ...messages.slice(-count)
+        ]
+      }
+    }
+
+    return _messages;
   }
 
   /** To make sure user is connected to Lit Protocol */
@@ -318,9 +388,16 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
     }
   }
 
-
   return(
-    <div className="flex flex-col h-full w-full bg-white pb-4 flex-1">
+    <div className="relative flex flex-col h-full w-full bg-white flex-1">
+        {/** Display conversation header */}
+        {selectedConv &&
+          <div className="absolute right-[15px] top-[15px] z-50">
+            <div className="h-10 w-10 bg-white border border-slate-300 justify-center items-center flex rounded-full text-gray-900 bg-white cursor-pointer hover:bg-gray-50 hover:border-slate-400" onClick={() => setViewSettings(true)}>
+              <MenuDots />
+            </div>
+          </div>
+        }
 
        {/** List all messages in a conversation */}
        <div className="h-full overflow-hidden px-1 md:px-3">
@@ -330,22 +407,32 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
             <LoadingCircle />
           </div>
         :
-          <Messages messages={messages} currentResponse={currentResponse} />
+          <Messages messages={messages} currentResponse={currentResponse} setViewSettings={setViewSettings} />
         }
        </div>
 
        {/** Input to send new messages */}
-       <div className="flex flex-row items-center bg-gray-50 border-t border-slate-200 pt-3 px-3">
+       <div className="flex flex-row items-center bg-gray-50 border-t border-slate-200 p-3">
         {(user && user.hasLit) ?
           <>
             {hasAccess ?
-              <MessageInput
-                commandMenu={commandMenu}
-                submitting={submitting}
-                message={message}
-                handleKeyDown={handleKeyDown}
-                handleInputChange={handleInputChange}
-                submit={submit} />
+              <>
+                {(personaEnabled && messages.length >= 2 && writeMode == false ) ?
+                  <div className="flex flex-row space-x-2 w-full items-center text-center justify-center">
+                    <p className="text-slate-600 text-center text-sm pb-1 pt-1">Reply with:</p>
+                    <LoopPersonas personas={personas} submit={submit} />
+                    <p className="text-slate-600 text-center text-sm pb-1 pt-1">or <span className="font-medium hover:underline text-blue-800 cursor-pointer" onClick={() => setWriteMode(true)}>Write prompt</span></p>
+                  </div>
+                :
+                  <MessageInput
+                    commandMenu={commandMenu}
+                    submitting={submitting}
+                    message={message}
+                    handleKeyDown={handleKeyDown}
+                    handleInputChange={handleInputChange}
+                    submit={submit} />
+                }
+              </>
             :
               <p className="text-slate-600 w-full text-center text-sm pb-1 pt-1">This app is gated based on some conditions. <span className="font-medium hover:underline text-blue-800 cursor-pointer" onClick={() => setAccessRulesModalVis(true)}>View conditions</span></p>
             }
@@ -363,6 +450,13 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
         }
        </div>
 
+       {/** Display conversation settings */}
+       {viewSettings &&
+         <BackgroundWrapper hide={() => setViewSettings(false)}>
+          <ConversationSettings personas={personas} setPersonas={setPersonas} />
+         </BackgroundWrapper>
+       }
+
        {/** Display more details about the access rules required for this context */}
        {accessRulesModalVis &&
          <AccessRulesModal accessRules={contextAccessRules} hide={() => setAccessRulesModalVis(false)} />
@@ -371,16 +465,11 @@ export default function ConversationDetails({selectedConv, setSelectedConv, conv
   )
 }
 
-/** Will return the last 5 messages from a conversation and add the initial prompt if it's missing */
-function getLastMessages(count, messages) {
-  let _messages = [];
-  if(messages.length <= count) {
-    _messages = messages
-  } else {
-    _messages = [
-      { role: "system", content: initPrompt },
-      ...messages.slice(-count)
-    ]
-  }
-  return _messages;
+/** Will loop and display personas CTA in the submit part to allow user to select which persona should be able to reply to it query */
+const LoopPersonas = ({personas, submit}) => {
+  return personas.map((persona, key) => {
+    return(
+      <button key={key} className="btn bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded font-medium text-sm" onClick={() => submit(key)}>{persona.label}</button>
+    )
+  });
 }
