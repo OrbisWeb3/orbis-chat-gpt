@@ -48,11 +48,11 @@ const PersonaSettings = ({id, persona, personas, setPersonas}) => {
       {viewSettings ?
         <div className="flex flex-col space-y-2 p-2">
           <div>
-            <p className="text-sm font-medium text-gray-900 text-left">Persona's label:</p>
+            <p className="text-sm font-medium text-gray-900 text-left">Persona&apos;s label:</p>
             <input type="text" className="mt-1 px-2 py-1.5 flex w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm bg-white" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Enter label" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900 text-left">Persona's rules:</p>
+            <p className="text-sm font-medium text-gray-900 text-left">Persona&apos;s rules:</p>
             <TextareaAutosize className="mt-1 px-2 py-1.5 flex w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm bg-white" value={systemPrompt} onChange={(e) => setSystemPrompt(e.target.value)} placeholder="Enter rules for this persona" rows="5" />
           </div>
           <div className="font-medium hover:underline text-blue-800 cursor-pointer w-full text-center" onClick={() => save()}>Save</div>
